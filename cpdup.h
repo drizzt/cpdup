@@ -11,6 +11,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -23,10 +24,21 @@
 #include <pwd.h>
 #include <assert.h>
 #ifndef NOMD5
-#include <md5.h>
+#include "md5.h"
 #endif
 #if USE_PTHREADS
 #include <pthread.h>
+#endif
+
+#ifndef __unused
+#ifndef GCC_VERSION                                                                                                                                                                                               
+#define GCC_VERSION (__GNUC__ * 1000 + __GNUC_MINOR__)                                                                                                                                                            
+#endif
+#if (GCC_VERSION >= 2007)
+#define __unused __attribute__ ((__unused__))
+#else
+#define __unused
+#endif
 #endif
 
 void logstd(const char *ctl, ...);
