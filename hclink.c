@@ -178,7 +178,7 @@ hcc_reader_thread(void *arg)
     pthread_detach(pthread_self());
     while (hcc_read_command(hc, NULL) != NULL)
 	;
-    hc->reader_thread = NULL;
+    hc->reader_thread = (pthread_t) NULL;
 
     /*
      * Clean up any threads stuck waiting for a reply.
