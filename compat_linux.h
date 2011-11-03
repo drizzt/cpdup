@@ -1,18 +1,16 @@
 #ifndef _COMPAT_LINUX_H
 #define _COMPAT_LINUX_H
 
-#ifndef __unused
-#ifndef GCC_VERSION                                                                                                                                                                                               
-#define GCC_VERSION (__GNUC__ * 1000 + __GNUC_MINOR__)                                                                                                                                                            
-#endif
-#if (GCC_VERSION >= 2007)
-#define __unused __attribute__ ((__unused__))
+#if __GNUC__
+# ifndef __unused
+#  define __unused __attribute__ ((__unused__))
+# endif
+# define strlcpy(dst, src, n) do { *((char *) __builtin_mempcpy (dst, src, n)) = '\0'; } while(0)
 #else
-#define __unused
+# ifndef __unused
+#  define __unused
+# endif
+# define strlcpy(dst, src, n) do { *((char *) memcpy (dst, src, n) + n) = '\0'; } while(0)
 #endif
-#endif
-
-extern size_t
-strlcpy(char * __restrict dst, const char * __restrict src, size_t siz);
 
 #endif

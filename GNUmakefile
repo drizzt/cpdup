@@ -1,6 +1,6 @@
-OBJS = cpdup.o fsmid.o hclink.o hcproto.o misc.o compat_linux.o
+OBJS = cpdup.o fsmid.o hclink.o hcproto.o misc.o
 
-CFLAGS += -std=gnu99 -D_GNU_SOURCE -D__USE_FILE_OFFSET64
+CFLAGS += -D_GNU_SOURCE -D__USE_FILE_OFFSET64
 
 ifndef NOPTHREADS
 CFLAGS += -DUSE_PTHREADS=1 -pthread
