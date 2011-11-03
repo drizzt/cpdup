@@ -7,7 +7,7 @@
 #ifndef _HCPROTO_H_
 #define _HCPROTO_H_
 
-#define HCPROTO_VERSION		2
+#define HCPROTO_VERSION		4
 #define HCPROTO_VERSION_COMPAT	2
 
 #define HC_HELLO	0x0001
@@ -35,6 +35,10 @@
 #define HC_RENAME	0x0024
 #define HC_UTIMES	0x0025
 #define HC_MKNOD	0x0026
+#define HC_GETEUID	0x0027
+#define HC_GETGROUPS	0x0028
+#define HC_SCANDIR	0x0029
+#define HC_READFILE	0x002A
 
 #define LC_HELLOSTR	(0x0001|LCF_STRING)
 #define LC_PATH1	(0x0010|LCF_STRING)
@@ -62,6 +66,7 @@
 #define LC_TYPE		(0x0026|LCF_INT32)
 #define LC_BLKSIZE	(0x0027|LCF_INT32)
 #define LC_VERSION	(0x0028|LCF_INT32)
+#define LC_COUNT	(0x0029|LCF_INT32)
 
 #define XO_NATIVEMASK	3		/* passed through directly */
 #define XO_CREAT	0x00010000
@@ -71,14 +76,22 @@
 #define HC_DESC_DIR	1
 #define HC_DESC_FD	2
 
-int hc_connect(struct HostConf *hc);
+#ifndef MAXNAMLEN
+#define MAXNAMLEN	255
+#endif
+
+struct HCDirEntry {
+	char d_name[MAXNAMLEN + 1];
+};
+
+int hc_connect(struct HostConf *hc, int readonly);
 void hc_slave(int fdin, int fdout);
 
 int hc_hello(struct HostConf *hc);
 int hc_stat(struct HostConf *hc, const char *path, struct stat *st);
 int hc_lstat(struct HostConf *hc, const char *path, struct stat *st);
 DIR *hc_opendir(struct HostConf *hc, const char *path);
-struct dirent *hc_readdir(struct HostConf *hc, DIR *dir);
+struct HCDirEntry *hc_readdir(struct HostConf *hc, DIR *dir, struct stat **statpp);
 int hc_closedir(struct HostConf *hc, DIR *dir);
 int hc_open(struct HostConf *hc, const char *path, int flags, mode_t mode);
 int hc_close(struct HostConf *hc, int fd);
@@ -98,6 +111,8 @@ mode_t hc_umask(struct HostConf *hc, mode_t numask);
 int hc_symlink(struct HostConf *hc, const char *name1, const char *name2);
 int hc_rename(struct HostConf *hc, const char *name1, const char *name2);
 int hc_utimes(struct HostConf *hc, const char *path, const struct timeval *times);
+uid_t hc_geteuid(struct HostConf *hc);
+int hc_getgroups(struct HostConf *hc, gid_t **gidlist);
 
 #endif
 
