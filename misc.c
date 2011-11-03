@@ -1,7 +1,5 @@
 /*
  * MISC.C
- *
- * $DragonFly: src/bin/cpdup/misc.c,v 1.16 2008/09/15 20:13:16 thomas Exp $
  */
 
 #include "cpdup.h"
@@ -55,10 +53,8 @@ fextract(FILE *fi, int n, int *pc, int skip)
     imax = (n < 0) ? 64 : n + 1;
 
     s = malloc(imax);
-    if (s == NULL) {
-	fprintf(stderr, "out of memory\n");
-	exit(EXIT_FAILURE);
-    }
+    if (s == NULL)
+	fatal("out of memory");
 
     while (c != EOF) {
 	if (n == 0 || (n < 0 && (c == ' ' || c == '\n')))
@@ -68,10 +64,8 @@ fextract(FILE *fi, int n, int *pc, int skip)
 	if (i == imax) {
 	    imax += 64;
 	    s = realloc(s, imax);
-    	    if (s == NULL) {
-                fprintf(stderr, "out of memory\n");
-  	        exit(EXIT_FAILURE);
- 	    }
+	    if (s == NULL)
+		fatal("out of memory");
 	}
 	if (n > 0)
 	    --n;
@@ -82,6 +76,26 @@ fextract(FILE *fi, int n, int *pc, int skip)
     *pc = c;
     s[i] = 0;
     return(s);
+}
+
+int16_t
+hc_bswap16(int16_t var)
+{
+    return ((var & 0xff) << 8 | (var >> 8 & 0xff));
+}
+
+int32_t
+hc_bswap32(int32_t var)
+{
+    return ((var & 0xff) << 24 | (var & 0xff00) << 8
+	    | (var >> 8 & 0xff00) | (var >> 24 & 0xff));
+}
+
+int64_t
+hc_bswap64(int64_t var)
+{
+    return (hc_bswap32(var >> 32 & 0xffffffff)
+	    | (int64_t) hc_bswap32(var & 0xffffffff) << 32);
 }
 
 #ifdef DEBUG_MALLOC
@@ -155,39 +169,45 @@ fatal(const char *ctl, ...)
 	puts("cpdup [<options>] src [dest]");
 	puts("    -C          request compressed ssh link if remote operation\n"
 	     "    -v[vv]      verbose level (-vv is typical)\n"
+	     "    -d          print directories being traversed\n"
 	     "    -u          use unbuffered output for -v[vv]\n"
 	     "    -I          display performance summary\n"
 	     "    -f          force update even if files look the same\n"
+	     "    -F<ssh_opt> Add <ssh_opt> to options passed to ssh\n"
 	     "    -i0         do NOT confirm when removing something\n"
+	     "    -j0         do not try to recreate CHR or BLK devices\n"
 	     "    -l          force line-buffered stdout/stderr\n"
-	     "    -pN         N parallel transactions for for remote\n"
-	     "                source or destination\n"
 	     "    -s0         disable safeties - allow files to overwrite directories\n"
 	     "    -q          quiet operation\n"
 	     "    -o          do not remove any files, just overwrite/add\n"
 	);
 	puts(
+	     "    -k          maintain/generate FSMID checkfile on target,\n"
+	     "                and compare source FSMIDs against the checkfiles\n"
+	     "    -K file     -k+specify FSMID checkfile, else .FSMID.CHECK\n"
 #ifndef NOMD5
 	     "    -m          maintain/generate MD5 checkfile on source,\n"
 	     "                and compare with (optional) destination,\n"
 	     "                copying if the compare fails\n"
 	     "    -M file     -m+specify MD5 checkfile, else .MD5_CHECKSUMS\n"
 	     "                copy if md5 check fails\n"
+#endif
 	     "    -H path     hardlink from path to target instead of copying\n"
+	     "    -R          read-only slave mode for ssh remotes\n"
 	     "                source to target, if source matches path.\n"
 	     "    -V          verify file contents even if they appear\n"
 	     "                to be the same.\n"
-#endif
+	     "    -VV         same as -V but ignore mtime entirely\n"
 	     "    -x          use .cpignore as exclusion file\n"
 	     "    -X file     specify exclusion file\n"
-	     " Version 1.14 by Matt Dillon and Dima Ruban\n"
+	     " Version 1.17 by Matt Dillon, Dima Ruban, & Oliver Fromme\n"
 	);
 	exit(0);
     } else {
 	va_start(va, ctl);
-	vprintf(ctl, va);
+	vfprintf(stderr, ctl, va);
 	va_end(va);
-	puts("");
-	exit(1);
+	putc('\n', stderr);
+	exit(EXIT_FAILURE);
     }
 }
