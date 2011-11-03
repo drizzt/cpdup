@@ -11,7 +11,6 @@
 
 #include <fcntl.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -36,15 +35,8 @@
 #include "compat_sun.h"
 #endif
 
-#ifndef __unused
-#ifndef GCC_VERSION                                                                                                                                                                                               
-#define GCC_VERSION (__GNUC__ * 1000 + __GNUC_MINOR__)                                                                                                                                                            
-#endif
-#if (GCC_VERSION >= 2007)
-#define __unused __attribute__ ((__unused__))
-#else
-#define __unused
-#endif
+#ifdef __linux
+#include "compat_linux.h"
 #endif
 
 void logstd(const char *ctl, ...);

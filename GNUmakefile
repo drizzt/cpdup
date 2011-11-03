@@ -1,4 +1,4 @@
-OBJS = cpdup.o fsmid.o hclink.o hcproto.o misc.o
+OBJS = cpdup.o fsmid.o hclink.o hcproto.o misc.o compat_linux.o
 
 CFLAGS += -std=gnu99 -D_GNU_SOURCE -D__USE_FILE_OFFSET64
 
