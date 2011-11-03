@@ -1,6 +1,8 @@
-OBJS = cpdup.o fsmid.o hclink.o hcproto.o misc.o
+SRCS = cpdup.c fsmid.c hclink.c hcproto.c misc.c
+OBJS = $(SRCS:%.c=%.o)
+DEPS = $(SRCS:%.c=%.d)
 
-CFLAGS += -D_GNU_SOURCE -D__USE_FILE_OFFSET64
+CPPFLAGS += -D_GNU_SOURCE -D__USE_FILE_OFFSET64 -MD -MP
 
 ifndef NOPTHREADS
 CFLAGS += -DUSE_PTHREADS=1 -pthread
@@ -9,16 +11,14 @@ endif
 ifdef NOMD5
 CFLAGS += -DNOMD5
 else
-OBJS += md5.o md5hl.o md5c.o
+SRCS += md5.c md5hl.c md5c.c
 endif
 
 all: cpdup
 
 cpdup: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o cpdup
-
-.c.o:
-	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	-rm -f $(OBJS)
+	-rm -f $(OBJS) $(DEPS)
+
+-include $(DEPS)
