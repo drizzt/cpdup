@@ -25,7 +25,7 @@
 #include <fnmatch.h>
 #include <assert.h>
 #ifndef NOMD5
-#include "md5.h"
+#include <md5.h>
 #endif
 
 /* Solaris needs <strings.h> for bzero(), bcopy() and bcmp(). */

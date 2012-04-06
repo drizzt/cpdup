@@ -5,15 +5,9 @@
 # ifndef __unused
 #  define __unused __attribute__ ((__unused__))
 # endif
-# define strlcpy(dst, src, n) do { *((char *) __builtin_mempcpy (dst, src, n)) = '\0'; } while(0)
 #else
 # ifndef __unused
 #  define __unused
-# endif
-# ifdef __GLIBC_
-#  define strlcpy(dst, src, n) do { *((char *) mempcpy (dst, src, n)) = '\0'; } while(0)
-# else
-#  define strlcpy(dst, src, n) do { *((char *) memcpy (dst, src, n) + n) = '\0'; } while(0)
 # endif
 #endif
 

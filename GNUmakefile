@@ -11,7 +11,9 @@ endif
 ifdef NOMD5
 CFLAGS += -DNOMD5
 else
-SRCS += md5.c md5hl.c md5c.c
+CFLAGS += $(shell pkg-config --cflags libbsd-overlay)
+LDLIBS += $(shell pkg-config --libs libbsd-overlay)
+SRCS += md5.c
 endif
 
 all: cpdup
